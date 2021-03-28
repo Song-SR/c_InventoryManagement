@@ -9,7 +9,7 @@ typedef struct {
     char code[MAX_CODE];
     char name[MAX_NAME];
     int price;
-    int quantity;
+    int sale_total;
     int reserve;
 }Inventory;
 
@@ -29,6 +29,7 @@ void save(Inventory inventories[]);
 int addinventory(Inventory inventories[]);
 void plusinventory(Inventory inventories[]);
 void dropinventory(Inventory inventories[]);
+void sale(Inventory inventories[]);
 
 int main(void)
 {
@@ -120,8 +121,8 @@ void sub2()
     {
         switch (key)//선택한 키에 따라 기능 수행
         {
-        // case 1: break;
-        case 2:  list(inventories2); break;
+        case 1: list(inventories2); sale(inventories); save(inventories); list(inventories2); break;
+        case 2: list(inventories2); break;
         default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
@@ -165,7 +166,7 @@ void list(Inventory inventories[]){
     {
         if(strcmp(inventories[i].code, "")){
             printf("%-10s %-10s %-10d %-10d %-10d %-10d\n", inventories[i].code, inventories[i].name, inventories[i].price,
-            inventories[i].quantity, (inventories[i].price*inventories[i].quantity), inventories[i].reserve);
+            inventories[i].sale_total, (inventories[i].price*inventories[i].sale_total), inventories[i].reserve);
         }else{
             printf("\n");
             break;
@@ -289,5 +290,46 @@ void dropinventory(Inventory inventories[]){
             break;
         }
     }
+    fclose(fp);
+}
+
+void sale(Inventory inventories[]){
+    char salecode[MAX_CODE];
+    int sale = 0;
+
+    fopen_s(&fp, "inventory_data.bin", "rb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    fread(inventories, sizeof(Inventory), MAX, fp);
+
+    printf("판매할 물품의 코드 또는 상품명을 입력하세요 : ");
+    scanf("%s", salecode, sizeof(salecode));
+
+    for(int i = 0; i < MAX; i++){
+        if(strcmp(inventories[i].code, salecode)){
+
+        }else{
+            printf("==코드:%-10s 상품명:%-10s 판매==\n", inventories[i].code, inventories[i].name);
+            printf("판매할 수량을 입력하세요 (0 ~ %d) : ", inventories[i].reserve);
+            scanf("%d", &sale);
+            inventories[i].reserve -= sale;
+            inventories[i].sale_total += sale;
+            break;
+        }
+        
+        if(strcmp(inventories[i].name, salecode)){
+
+        }else{
+            printf("==코드:%-10s 상품명:%-10s 판매==\n", inventories[i].code, inventories[i].name);
+            printf("판매할 수량을 입력하세요 (0 ~ %d) : ", inventories[i].reserve);
+            scanf("%d", &sale);
+            inventories[i].reserve -= sale;
+            inventories[i].sale_total += sale;
+            break;
+        }
+    }
+
     fclose(fp);
 }
