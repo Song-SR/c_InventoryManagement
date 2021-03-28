@@ -95,19 +95,19 @@ void sub1()
     key = 0;
     while ((key = select_sub1()) != 0)//선택한 메뉴가 0이 아니면 반복
     {
+        list_short(inventories2);
         switch (key)//선택한 키에 따라 기능 수행
         {
         case 1:
-            list_short(inventories2);
             if(addinventory(inventories)){
                save(inventories); list_short(inventories2); break; 
             }else{
                 list_short(inventories2); printf("==해당 물품은 이미 등록되어 있습니다.==\n\n"); break;
             };
             
-        case 2: list_short(inventories2); plusinventory(inventories); save(inventories); list_short(inventories2); break;
-        case 3: list_short(inventories2); dropinventory(inventories); save(inventories); list_short(inventories2); break;
-        default: list_short(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
+        case 2: plusinventory(inventories); save(inventories); list_short(inventories2); break;
+        case 3: dropinventory(inventories); save(inventories); list_short(inventories2); break;
+        default: printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
     system("cls");
@@ -119,11 +119,12 @@ void sub2()
     key = 0;
     while ((key = select_sub2()) != 0)//선택한 메뉴가 0이 아니면 반복
     {
+        list(inventories2);
         switch (key)//선택한 키에 따라 기능 수행
         {
-        case 1: list(inventories2); sale(inventories); save(inventories); list(inventories2); break;
-        case 2: list(inventories2); break;
-        default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
+        case 1: sale(inventories); save(inventories); list(inventories2); break;
+        case 2: break;
+        default: printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
     system("cls");
