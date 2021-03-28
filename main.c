@@ -21,17 +21,13 @@ Inventory inventories[MAX] =
 Inventory inventories2[MAX];
 int key;
 
-void makefile();
-void run();
-void sub1();
-void sub2();
-int select_main();
-int select_sub1();
-int select_sub2();
+void makefile(), run(), sub1(), sub2();
+int select_main(), select_sub1(), select_sub2();
 void list_short(Inventory inventories[]);
 void list(Inventory inventories[]);
 void save(Inventory inventories[]);
 int addinventory(Inventory inventories[]);
+void plusinventory(Inventory inventories[]);
 void dropinventory(Inventory inventories[]);
 
 int main(void)
@@ -62,7 +58,7 @@ void run(){
         }
     }
     system("cls");
-    printf("프로그램 종료\n");
+    printf("==프로그램 종료==");
 }
 
 int select_main()
@@ -78,7 +74,7 @@ int select_sub1()
 {
     key = 0;
     printf("재고 관리 프로그램\n");
-    printf("1:물품 등록  2:입고  3:출고  4:항목제거  //  0:메인으로\n");
+    printf("1:물품 등록  2:입출고  3:항목제거  //  0:메인으로\n");
     scanf("%d", &key);
     return key;
 }
@@ -108,9 +104,8 @@ void sub1()
                 list_short(inventories2); printf("==해당 물품은 이미 등록되어 있습니다.==\n\n"); break;
             };
             
-        // case 2: break;
-        // case 3: break;
-        case 4: list_short(inventories2); dropinventory(inventories); save(inventories); list_short(inventories2); break;
+        case 2: list_short(inventories2); plusinventory(inventories); save(inventories); list_short(inventories2); break;
+        case 3: list_short(inventories2); dropinventory(inventories); save(inventories); list_short(inventories2); break;
         default: list_short(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
@@ -125,7 +120,7 @@ void sub2()
     {
         switch (key)//선택한 키에 따라 기능 수행
         {
-        case 1: break;
+        // case 1: break;
         case 2:  list(inventories2); break;
         default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
         }
@@ -232,6 +227,45 @@ int addinventory(Inventory inventories[]){
 
     fclose(fp);
     return 1;
+}
+
+void plusinventory(Inventory inventories[]){
+    char pluscode[MAX_CODE];
+    int add = 0;
+
+    fopen_s(&fp, "inventory_data.bin", "rb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    fread(inventories, sizeof(Inventory), MAX, fp);
+
+    printf("입출고할 물품의 코드 또는 상품명을 입력하세요 : ");
+    scanf("%s", pluscode, sizeof(pluscode));
+
+    for(int i = 0; i < MAX; i++){
+        if(strcmp(inventories[i].code, pluscode)){
+
+        }else{
+            printf("입고할 수량을 입력하세요 (출고는 마이너스로 기재) : ");
+            scanf("%d", &add);
+            inventories[i].reserve += add;
+            printf("%d", inventories[i].reserve);
+            break;
+        }
+        
+        if(strcmp(inventories[i].name, pluscode)){
+
+        }else{
+            printf("입고할 수량을 입력하세요 (출고는 마이너스로 기재) : ");
+            scanf("%d", &add);
+            inventories[i].reserve += add;
+            printf("%d", inventories[i].reserve);
+            break;
+        }
+    }
+
+    fclose(fp);
 }
 
 void dropinventory(Inventory inventories[]){
