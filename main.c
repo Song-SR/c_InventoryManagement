@@ -19,10 +19,16 @@ Inventory inventories[MAX] =
     // { "code001","사과",100,0,200 }
 };
 Inventory inventories2[MAX];
+int key;
 
 void makefile();
 void run();
-int selectmenu();
+void sub1();
+void sub2();
+int select_main();
+int select_sub1();
+int select_sub2();
+void list_short(Inventory inventories[]);
 void list(Inventory inventories[]);
 void save(Inventory inventories[]);
 int addinventory(Inventory inventories[]);
@@ -42,40 +48,112 @@ void makefile(){
     fclose(fp);
 }
 
-void run()
-{
+void run(){
     system("cls");
-    int key = 0;
-    while ((key = selectmenu()) != 0)//선택한 메뉴가 0이 아니면 반복
+    key = 0;
+    while ((key = select_main()) != 0)//선택한 메뉴가 0이 아니면 반복
     {
         switch (key)//선택한 키에 따라 기능 수행
         {
-        case 1:
-            list(inventories2);
-            if(addinventory(inventories)){
-               save(inventories); list(inventories2); break; 
-            }else{
-                list(inventories2); printf("==해당 물품은 이미 등록되어 있습니다.==\n\n"); break;
-            };
-            
-        // case 2: break;
-        // case 3: break;
-        case 4: list(inventories2); dropinventory(inventories); save(inventories); list(inventories2); break;
-        case 5: list(inventories2); break;
-        default: printf("잘못 선택하였습니다.\n"); break;
+        case 1: sub1(); break;
+        case 2: sub2(); break;
+        case 3: list(inventories2); break;
+        default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
     system("cls");
     printf("프로그램 종료\n");
 }
 
-int selectmenu()
+int select_main()
 {
-    int key = 0;
-    printf("재고 관리 프로그램 (0:종료)\n");
-    printf("1:물품 등록  2:입고  3:출고  4:항목제거  5:list\n");
+    key = 0;
+    printf("재고 관리 프로그램\n");
+    printf("1:재고관리  2:매출관리  3:전체물품보기  //  0:프로그램종료\n");
     scanf("%d", &key);
     return key;
+}
+
+int select_sub1()
+{
+    key = 0;
+    printf("재고 관리 프로그램\n");
+    printf("1:물품 등록  2:입고  3:출고  4:항목제거  //  0:메인으로\n");
+    scanf("%d", &key);
+    return key;
+}
+
+int select_sub2()
+{
+    key = 0;
+    printf("재고 관리 프로그램\n");
+    printf("1:상품판매  2:총매출확인  //  0:메인으로\n");
+    scanf("%d", &key);
+    return key;
+}
+
+void sub1()
+{
+    system("cls");
+    key = 0;
+    while ((key = select_sub1()) != 0)//선택한 메뉴가 0이 아니면 반복
+    {
+        switch (key)//선택한 키에 따라 기능 수행
+        {
+        case 1:
+            list_short(inventories2);
+            if(addinventory(inventories)){
+               save(inventories); list_short(inventories2); break; 
+            }else{
+                list_short(inventories2); printf("==해당 물품은 이미 등록되어 있습니다.==\n\n"); break;
+            };
+            
+        // case 2: break;
+        // case 3: break;
+        case 4: list_short(inventories2); dropinventory(inventories); save(inventories); list_short(inventories2); break;
+        default: list_short(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
+        }
+    }
+    system("cls");
+}
+
+void sub2()
+{
+    system("cls");
+    key = 0;
+    while ((key = select_sub2()) != 0)//선택한 메뉴가 0이 아니면 반복
+    {
+        switch (key)//선택한 키에 따라 기능 수행
+        {
+        case 1: break;
+        case 2:  list(inventories2); break;
+        default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
+        }
+    }
+    system("cls");
+}
+
+void list_short(Inventory inventories[]){
+    system("cls");
+    fopen_s(&fp, "inventory_data.bin", "rb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    fread(inventories, sizeof(Inventory), MAX, fp);
+
+    printf("%-10s %-10s %-10s %-10s\n", "코드", "상품명", "단가", "재고량");
+    for (int i = 0; i < MAX; i++)
+    {
+        if(strcmp(inventories[i].code, "")){
+            printf("%-10s %-10s %-10d %-10d\n", inventories[i].code, inventories[i].name,
+            inventories[i].price, inventories[i].reserve);
+        }else{
+            printf("\n");
+            break;
+        }  
+    }
+    fclose(fp);
 }
 
 void list(Inventory inventories[]){
@@ -171,7 +249,6 @@ void dropinventory(Inventory inventories[]){
         if(strcmp(inventories[i].code, dropcode)){
 
         }else{
-            printf("삭제 진행중!");
             for(int j = i; j < MAX; j++){
                 inventories[j] = inventories[j+1];
             }
