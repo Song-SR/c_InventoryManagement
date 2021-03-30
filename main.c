@@ -28,6 +28,7 @@ Inventory inventories[MAX];  // 변경할 데이터 임시 저장용도
 Inventory inventories2[MAX];  // 리스트 불러오기 용도
 Inventory inventories3[MAX];  // 초기화 용도 (빈 값) - 개발자용
 Inventory inventories4[MAX];  // 등록 로그용
+Inventory inventories5[MAX];  // 입출고 로그용
 Inventory *inv_clear = inventories2;
 int key, change;
 struct tm *t;
@@ -37,9 +38,11 @@ void makefile(), run(), sub1(), sub2(), sub3();
 int select_main(), select_sub1(), select_sub2();
 void list_short(Inventory inventories[]);
 void list(Inventory inventories[]);
-void list_log(Inventory inventories[]);
+void list_addlog(Inventory inventories[]);
+void list_pluslog(Inventory inventories[]);
 void save(Inventory inventories[]);
 void save_add(Inventory inventories[]);
+void save_plus(Inventory inventories[]);
 int addinventory(Inventory inventories[]);
 void plusinventory(Inventory inventories[]);
 void dropinventory(Inventory inventories[]);
@@ -59,7 +62,9 @@ int main(void)
 void makefile(){
     fopen_s(&fp, "inventory_data.bin", "a+b");
     fclose(fp);
-    fopen_s(&fp, "log_data.bin", "a+b");
+    fopen_s(&fp, "log_adddata.bin", "a+b");
+    fclose(fp);
+    fopen_s(&fp, "log_plusdata.bin", "a+b");
     fclose(fp);
 }
 
@@ -136,7 +141,7 @@ void sub1()
                 list_short(inventories2); printf("==해당 물품은 이미 등록되어 있습니다.==\n\n"); break;
             };
             
-        case 2: plusinventory(inventories); save(inventories); list_short(inventories2); break;
+        case 2: plusinventory(inventories); save(inventories); save_plus(inventories5); list_short(inventories2); break;
         case 3: dropinventory(inventories); save(inventories); list_short(inventories2); break;
         default: printf("==잘못 선택하였습니다.==\n"); break;
         }
@@ -170,8 +175,8 @@ void sub3()
     {
         switch (key)
         {
-        case 1: list_log(inventories2); break;
-        case 2: break;
+        case 1: list_addlog(inventories2); break;
+        case 2: list_pluslog(inventories2); break;
         case 3: break;
         default: printf("==잘못 선택하였습니다.==\n"); break;
         }
@@ -226,9 +231,9 @@ void list(Inventory inventories[]){
     fclose(fp);
 }
 
-void list_log(Inventory inventories[]){
+void list_addlog(Inventory inventories[]){
     system("cls");
-    fopen_s(&fp, "log_data.bin", "rb");
+    fopen_s(&fp, "log_adddata.bin", "rb");
     if (fp == NULL){
         perror("error fopen");
         return;
@@ -249,6 +254,30 @@ void list_log(Inventory inventories[]){
     fclose(fp);
 }
 
+void list_pluslog(Inventory inventories[]){
+    system("cls");
+    fopen_s(&fp, "log_plusdata.bin", "rb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    fread(inventories, sizeof(Inventory), MAX, fp);
+
+    printf("%-20s %-10s %-10s %-10s %-10s\n", "날짜", "코드", "상품명", "입고/출고", "등록수량");
+    for (int i = 0; i < MAX; i++)
+    {
+        if(strcmp(inventories[i].code, "")){
+            printf("%-20s %-10s %-10s %-10d %-10d\n", inventories[i].add_date, inventories[i].code,
+            inventories[i].name, inventories[i].plus_count, inventories[i].reserve);
+        }else{
+            printf("\n");
+            break;
+        }  
+    }
+    fclose(fp);
+}
+
+
 void save(Inventory inventories[]){
     fopen_s(&fp, "inventory_data.bin", "wb");
     if (fp == NULL){
@@ -264,7 +293,21 @@ void save(Inventory inventories[]){
 }
 
 void save_add(Inventory inventories[]){
-    fopen_s(&fp, "log_data.bin", "wb");
+    fopen_s(&fp, "log_adddata.bin", "wb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    if (fwrite(inventories, sizeof(Inventory), MAX, fp) != MAX)
+    {
+        printf("출력 오류\n");
+        return;
+    }
+    fclose(fp);
+}
+
+void save_plus(Inventory inventories[]){
+    fopen_s(&fp, "log_plusdata.bin", "wb");
     if (fp == NULL){
         perror("error fopen");
         return;
@@ -353,7 +396,16 @@ void plusinventory(Inventory inventories[]){
             printf("입고할 수량을 입력하세요 (출고는 마이너스로 기재) : ");
             scanf("%d", &add);
             inventories[i].reserve += add;
-            printf("%d", inventories[i].reserve);
+            inventories[i].plus_count = add;
+            for(int k = 0; k < MAX; k++){
+                if(strcmp(inventories5[k].code, "")){
+            
+                }else{
+                    inventories5[k] = inventories[i];
+                    break;
+                }
+            }
+
             break;
         }
         
@@ -363,7 +415,16 @@ void plusinventory(Inventory inventories[]){
             printf("입고할 수량을 입력하세요 (출고는 마이너스로 기재) : ");
             scanf("%d", &add);
             inventories[i].reserve += add;
-            printf("%d", inventories[i].reserve);
+            inventories[i].plus_count = add;
+            for(int k = 0; k < MAX; k++){
+                if(strcmp(inventories5[k].code, "")){
+            
+                }else{
+                    inventories5[k] = inventories[i];
+                    break;
+                }
+            }
+            
             break;
         }
     }
@@ -441,7 +502,9 @@ void sale(Inventory inventories[]){
 }
 
 void data_clear(){
-    fopen_s(&fp, "log_data.bin", "w");
+    fopen_s(&fp, "log_adddata.bin", "w");
+    fclose(fp);
+    fopen_s(&fp, "log_plusdata.bin", "w");
     fclose(fp);
     system("cls");
 }
