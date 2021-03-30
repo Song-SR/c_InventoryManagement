@@ -12,10 +12,13 @@ typedef struct {
     char name[MAX_NAME];
     int price;  // 단가
     int sale_total;  // 총 판매량
+    char add_date[MAX_DATE];  // 등록일
+    int add_count;  // 등록 수량
     int reserve;  // 재고량
     char sale_date[MAX_DATE];  // 판매일
-    char add_date[MAX_DATE];  // 입출고일(+등록)
-    int add_count;  // 입출고 수량
+    int sale_count;  // 판매수량
+    int plus_count;  // 입출고수량
+    char plus_date[MAX_DATE];  // 입출고일
     int sale;  // 해당 판매액
 
 }Inventory;
@@ -24,6 +27,7 @@ typedef struct {
 Inventory inventories[MAX];  // 변경할 데이터 임시 저장용도
 Inventory inventories2[MAX];  // 리스트 불러오기 용도
 Inventory inventories3[MAX];  // 초기화 용도 (빈 값) - 개발자용
+Inventory inventories4[MAX];  // 등록 로그용
 Inventory *inv_clear = inventories2;
 int key, change;
 struct tm *t;
@@ -70,7 +74,8 @@ void run(){
         case 2: sub2(); break;
         case 3: sub3(); break;
         case 4: list(inventories2); break;
-        case 99: data_clear(); save(inventories3); save_add(inventories3); list(inventories2); break;  // data 초기화용(개발자용)
+        case 99: data_clear(); save(inventories3); save_add(inventories3);
+                list(inventories2); printf("==데이터 초기화 완료 (개발자용)==\n\n"); break;  // data 초기화용(개발자용)
         default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
@@ -125,7 +130,7 @@ void sub1()
         {
         case 1:
             if(addinventory(inventories)){
-               save_add(inventories);
+               save_add(inventories4);
                save(inventories); list_short(inventories2); break; 
             }else{
                 list_short(inventories2); printf("==해당 물품은 이미 등록되어 있습니다.==\n\n"); break;
@@ -237,7 +242,6 @@ void list_log(Inventory inventories[]){
             printf("%-20s %-10s %-10s %-10d %-10d\n", inventories[i].add_date, inventories[i].code,
             inventories[i].name, inventories[i].price, inventories[i].reserve);
         }else{
-            printf("현재의 i는 : %d", i);
             printf("\n");
             break;
         }  
@@ -260,7 +264,7 @@ void save(Inventory inventories[]){
 }
 
 void save_add(Inventory inventories[]){
-    fopen_s(&fp, "log_data.bin", "ab");
+    fopen_s(&fp, "log_data.bin", "wb");
     if (fp == NULL){
         perror("error fopen");
         return;
@@ -314,6 +318,15 @@ int addinventory(Inventory inventories[]){
 	t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
 
     sprintf(inventories[i].add_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+
+    for(int k = 0; k < MAX; k++){
+        if(strcmp(inventories4[k].code, "")){
+            
+        }else{
+            inventories4[k] = inventories[i];
+            break;
+        }
+    }
 
     fclose(fp);
     return 1;
@@ -428,10 +441,7 @@ void sale(Inventory inventories[]){
 }
 
 void data_clear(){
-    fopen_s(&fp, "inventory_data.bin", "w");
-    fclose(fp);
     fopen_s(&fp, "log_data.bin", "w");
     fclose(fp);
     system("cls");
-    printf("데이터 초기화 완료!\n");
 }
