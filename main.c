@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <time.h>
  
 #define MAX_CODE 10
 #define MAX_NAME 10
@@ -8,20 +9,24 @@ FILE * fp;
 typedef struct {
     char code[MAX_CODE];
     char name[MAX_NAME];
-    int price;
-    int sale_total;
-    int reserve;
+    int price;  // 단가
+    int sale_total;  // 총 판매량
+    int reserve;  // 재고량
+    long sale_date;  // 판매일
+    int add_count;  // 입출고수량
+    long add_date;  // 입출고일
+    int sale;  // 해당 판매액
+
 }Inventory;
 
 #define MAX 100
-Inventory inventories[MAX] =
-{
-    // { "code001","사과",100,0,200 }
-};
-Inventory inventories2[MAX];
+Inventory inventories[MAX];  // 변경할 데이터 임시 저장용도
+Inventory inventories2[MAX];  // 리스트 불러오기 용도
 int key;
+struct tm *t;
+time_t timer; // 시간측정
 
-void makefile(), run(), sub1(), sub2();
+void makefile(), run(), sub1(), sub2(), sub3();
 int select_main(), select_sub1(), select_sub2();
 void list_short(Inventory inventories[]);
 void list(Inventory inventories[]);
@@ -54,7 +59,8 @@ void run(){
         {
         case 1: sub1(); break;
         case 2: sub2(); break;
-        case 3: list(inventories2); break;
+        case 3: sub3(); break;
+        case 4: list(inventories2); break;
         default: list(inventories2); printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
@@ -66,7 +72,7 @@ int select_main()
 {
     key = 0;
     printf("재고 관리 프로그램\n");
-    printf("1:재고관리  2:매출관리  3:전체물품보기  //  0:프로그램종료\n");
+    printf("1:재고관리  2:매출관리  3:내역확인  4:전체물품보기  //  0:프로그램종료\n");
     scanf("%d", &key);
     return key;
 }
@@ -85,6 +91,15 @@ int select_sub2()
     key = 0;
     printf("재고 관리 프로그램\n");
     printf("1:상품판매  2:총매출확인  //  0:메인으로\n");
+    scanf("%d", &key);
+    return key;
+}
+
+int select_sub3()
+{
+    key = 0;
+    printf("재고 관리 프로그램\n");
+    printf("1:등록내역  2:입출고내역  3:판매내역  //  0:메인으로\n");
     scanf("%d", &key);
     return key;
 }
@@ -124,6 +139,25 @@ void sub2()
         {
         case 1: sale(inventories); save(inventories); list(inventories2); break;
         case 2: break;
+        default: printf("==잘못 선택하였습니다.==\n"); break;
+        }
+    }
+    system("cls");
+}
+
+void sub3()
+{
+    // 1:등록내역  2:입출고내역  3:판매내역
+    system("cls");
+    key = 0;
+    while ((key = select_sub3()) != 0)//선택한 메뉴가 0이 아니면 반복
+    {
+        list(inventories2);
+        switch (key)
+        {
+        case 1: break;
+        case 2: break;
+        case 3: break;
         default: printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
@@ -227,8 +261,13 @@ int addinventory(Inventory inventories[]){
     printf("수량 : ");
     scanf("%d", &(inventories[i].reserve));
 
+    timer = time(NULL);
+	t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
+	
+    inventories[i].add_date = ("%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+    
     fclose(fp);
-    return 1;
+    return inventories[i].reserve;
 }
 
 void plusinventory(Inventory inventories[]){
@@ -317,6 +356,10 @@ void sale(Inventory inventories[]){
             scanf("%d", &sale);
             inventories[i].reserve -= sale;
             inventories[i].sale_total += sale;
+
+            
+
+
             break;
         }
         
