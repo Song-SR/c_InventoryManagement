@@ -83,7 +83,7 @@ void list_pluslog(Inventory inventories[]){
     for (int i = 0; i < MAX; i++)
     {
         if(strcmp(inventories[i].code, "")){
-            printf("%-20s %-10s %-10s %-10d %-10d\n", inventories[i].add_date, inventories[i].code,
+            printf("%-20s %-10s %-10s %-10d %-10d\n", inventories[i].plus_date, inventories[i].code,
             inventories[i].name, inventories[i].plus_count, inventories[i].reserve);
         }else{
             printf("\n");
@@ -93,6 +93,28 @@ void list_pluslog(Inventory inventories[]){
     fclose(fp);
 }
 
+void list_salelog(Inventory inventories[]){
+    system("cls");
+    fopen_s(&fp, "log_saledata.bin", "rb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    fread(inventories, sizeof(Inventory), MAX, fp);
+
+    printf("%-20s %-10s %-10s %-10s %-10s %-10s\n", "날짜", "코드", "상품명", "단가", "판매량", "판매액");
+    for (int i = 0; i < MAX; i++)
+    {
+        if(strcmp(inventories[i].code, "")){
+            printf("%-20s %-10s %-10s %-10d %-10d %-10d\n", inventories[i].sale_date, inventories[i].code,
+            inventories[i].name, inventories[i].price, inventories[i].sale_count, inventories[i].price * inventories[i].sale_count);
+        }else{
+            printf("\n");
+            break;
+        }  
+    }
+    fclose(fp);
+}
 
 void save(Inventory inventories[]){
     fopen_s(&fp, "inventory_data.bin", "wb");
@@ -124,6 +146,20 @@ void save_add(Inventory inventories[]){
 
 void save_plus(Inventory inventories[]){
     fopen_s(&fp, "log_plusdata.bin", "wb");
+    if (fp == NULL){
+        perror("error fopen");
+        return;
+    }
+    if (fwrite(inventories, sizeof(Inventory), MAX, fp) != MAX)
+    {
+        printf("출력 오류\n");
+        return;
+    }
+    fclose(fp);
+}
+
+void save_sale(Inventory inventories[]){
+    fopen_s(&fp, "log_saledata.bin", "wb");
     if (fp == NULL){
         perror("error fopen");
         return;
@@ -211,6 +247,11 @@ void plusinventory(Inventory inventories[]){
         }else{
             printf("입고할 수량을 입력하세요 (출고는 마이너스로 기재) : ");
             scanf("%d", &add);
+
+            timer = time(NULL);
+	        t = localtime(&timer);
+            sprintf(inventories[i].plus_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+
             inventories[i].reserve += add;
             inventories[i].plus_count = add;
             for(int k = 0; k < MAX; k++){
@@ -232,6 +273,11 @@ void plusinventory(Inventory inventories[]){
             scanf("%d", &add);
             inventories[i].reserve += add;
             inventories[i].plus_count = add;
+
+            timer = time(NULL);
+	        t = localtime(&timer);
+            sprintf(inventories[i].plus_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+
             for(int k = 0; k < MAX; k++){
                 if(strcmp(inventories5[k].code, "")){
             
@@ -263,6 +309,21 @@ void dropinventory(Inventory inventories[]){
         if(strcmp(inventories[i].code, dropcode)){
 
         }else{
+
+            timer = time(NULL);
+	        t = localtime(&timer);
+            sprintf(inventories[i].add_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+            inventories[i].reserve *= -1;
+
+            for(int k = 0; k < MAX; k++){
+                if(strcmp(inventories4[k].code, "")){
+            
+                }else{
+                    inventories4[k] = inventories[i];
+                    break;
+                }
+            }
+
             for(int j = i; j < MAX; j++){
                 inventories[j] = inventories[j+1];
             }
@@ -295,9 +356,20 @@ void sale(Inventory inventories[]){
             scanf("%d", &sale);
             inventories[i].reserve -= sale;
             inventories[i].sale_total += sale;
+            inventories[i].sale_count = sale;
 
+            timer = time(NULL);
+            t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
+            sprintf(inventories[i].sale_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+
+            for(int k = 0; k < MAX; k++){
+                if(strcmp(inventories6[k].code, "")){
             
-
+                }else{
+                    inventories6[k] = inventories[i];
+                    break;
+                }
+            }
 
             break;
         }
@@ -310,6 +382,20 @@ void sale(Inventory inventories[]){
             scanf("%d", &sale);
             inventories[i].reserve -= sale;
             inventories[i].sale_total += sale;
+            inventories[i].sale_count = sale;
+
+            timer = time(NULL);
+            t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
+            sprintf(inventories[i].sale_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
+
+            for(int k = 0; k < MAX; k++){
+                if(strcmp(inventories6[k].code, "")){
+            
+                }else{
+                    inventories6[k] = inventories[i];
+                    break;
+                }
+            }
             break;
         }
     }

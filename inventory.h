@@ -34,4 +34,4 @@ Inventory inventories2[MAX];  // 리스트 불러오기 용도
 Inventory inventories3[MAX];  // 초기화 용도 (빈 값) - 개발자용
 Inventory inventories4[MAX];  // 등록 로그용
 Inventory inventories5[MAX];  // 입출고 로그용
-
+Inventory inventories6[MAX];  // 판매 로그용

@@ -6,19 +6,23 @@ void list_short(Inventory inventories[]);
 void list(Inventory inventories[]);
 void list_addlog(Inventory inventories[]);
 void list_pluslog(Inventory inventories[]);
+void list_salelog(Inventory inventories[]);
 void save(Inventory inventories[]);
 void save_add(Inventory inventories[]);
 void save_plus(Inventory inventories[]);
+void save_sale(Inventory inventories[]);
 int addinventory(Inventory inventories[]);
 void plusinventory(Inventory inventories[]);
 void dropinventory(Inventory inventories[]);
 void sale(Inventory inventories[]);
 void show_add(Inventory inventories[]);
+void data_read();
 void data_clear();
 
 int main(void)
 {
     makefile();
+    data_read();
     run();
 
     return 0;
@@ -30,6 +34,8 @@ void makefile(){
     fopen_s(&fp, "log_adddata.bin", "a+b");
     fclose(fp);
     fopen_s(&fp, "log_plusdata.bin", "a+b");
+    fclose(fp);
+    fopen_s(&fp, "log_saledata.bin", "a+b");
     fclose(fp);
 }
 
@@ -107,7 +113,7 @@ void sub1()
             };
             
         case 2: plusinventory(inventories); save(inventories); save_plus(inventories5); list_short(inventories2); break;
-        case 3: dropinventory(inventories); save(inventories); list_short(inventories2); break;
+        case 3: dropinventory(inventories); save(inventories); save_add(inventories4); list_short(inventories2); break;
         default: printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
@@ -123,7 +129,7 @@ void sub2()
         list(inventories2);
         switch (key)//선택한 키에 따라 기능 수행
         {
-        case 1: sale(inventories); save(inventories); list(inventories2); break;
+        case 1: sale(inventories); save(inventories); save_sale(inventories6); list(inventories2); break;
         case 2: break;
         default: printf("==잘못 선택하였습니다.==\n"); break;
         }
@@ -142,17 +148,31 @@ void sub3()
         {
         case 1: list_addlog(inventories2); break;
         case 2: list_pluslog(inventories2); break;
-        case 3: break;
+        case 3: list_salelog(inventories2); break;
         default: printf("==잘못 선택하였습니다.==\n"); break;
         }
     }
     system("cls");
 }
 
+void data_read(){
+    fopen_s(&fp, "log_adddata.bin", "rb");
+    fread(inventories4, sizeof(Inventory), MAX, fp);
+    fclose(fp);
+    fopen_s(&fp, "log_plusdata.bin", "rb");
+    fread(inventories5, sizeof(Inventory), MAX, fp);
+    fclose(fp);
+    fopen_s(&fp, "log_saledata.bin", "rb");
+    fread(inventories6, sizeof(Inventory), MAX, fp);
+    fclose(fp);
+}
+
 void data_clear(){
     fopen_s(&fp, "log_adddata.bin", "w");
     fclose(fp);
     fopen_s(&fp, "log_plusdata.bin", "w");
+    fclose(fp);
+    fopen_s(&fp, "log_saledata.bin", "w");
     fclose(fp);
     system("cls");
 }
