@@ -1,4 +1,4 @@
-### C언어를 사용한 InvetoryManagement Program
+### C언어를 사용한 InventoryManagement Program
 
 ### (2021.03.31. 기능 1차적 완성  / 추가수정여부 불확실)
 
