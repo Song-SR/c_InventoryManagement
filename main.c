@@ -99,10 +99,10 @@ void sub1()
 {
     system("cls");
     key = 0;
-    while ((key = select_sub1()) != 0)//선택한 메뉴가 0이 아니면 반복
+    while ((key = select_sub1()) != 0)
     {
         list_short(inventories2);
-        switch (key)//선택한 키에 따라 기능 수행
+        switch (key)
         {
         case 1:
             if(addinventory(inventories)){
@@ -124,10 +124,10 @@ void sub2()
 {
     system("cls");
     key = 0;
-    while ((key = select_sub2()) != 0)//선택한 메뉴가 0이 아니면 반복
+    while ((key = select_sub2()) != 0)
     {
         list(inventories2);
-        switch (key)//선택한 키에 따라 기능 수행
+        switch (key)
         {
         case 1: sale(inventories); save(inventories); save_sale(inventories6); list(inventories2); break;
         case 2: break;
@@ -139,10 +139,9 @@ void sub2()
 
 void sub3()
 {
-    // 1:등록내역  2:입출고내역  3:판매내역
     system("cls");
     key = 0;
-    while ((key = select_sub3()) != 0)//선택한 메뉴가 0이 아니면 반복
+    while ((key = select_sub3()) != 0)
     {
         switch (key)
         {

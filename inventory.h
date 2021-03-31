@@ -26,7 +26,6 @@ typedef struct {
     int plus_count;  // 입출고수량
     char plus_date[MAX_DATE];  // 입출고일
     int sale;  // 해당 판매액
-
 }Inventory;
 
 Inventory inventories[MAX];  // 변경할 데이터 임시 저장용도

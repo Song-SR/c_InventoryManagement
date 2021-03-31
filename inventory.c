@@ -359,7 +359,7 @@ void sale(Inventory inventories[]){
             inventories[i].sale_count = sale;
 
             timer = time(NULL);
-            t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
+            t = localtime(&timer);
             sprintf(inventories[i].sale_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
 
             for(int k = 0; k < MAX; k++){
@@ -385,7 +385,7 @@ void sale(Inventory inventories[]){
             inventories[i].sale_count = sale;
 
             timer = time(NULL);
-            t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
+            t = localtime(&timer);
             sprintf(inventories[i].sale_date, "%d-%d-%d %d:%d", t->tm_year+1900, t->tm_mon+1, t->tm_mday, t->tm_hour, t->tm_min);
 
             for(int k = 0; k < MAX; k++){
